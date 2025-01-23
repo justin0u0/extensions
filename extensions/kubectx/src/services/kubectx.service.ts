@@ -6,7 +6,8 @@ import { getBrewExecutablePath, getKubeConfig } from "../lib/cli";
 
 const execFilePromise = util.promisify(execFile);
 
-const path = getBrewExecutablePath("kubectx");
+const kubectx = getBrewExecutablePath("kubectx");
+const kubectl = getBrewExecutablePath("kubectl");
 
 const kubeConfig = getKubeConfig();
 
@@ -15,7 +16,12 @@ if (kubeConfig) {
 }
 
 export const getCurrentContext = async () => {
-  const { stdout } = await execFilePromise(`${path}`, ["-c"]);
+  const { stdout } = await execFilePromise(`${kubectx}`, ["-c"], {
+    env: {
+      ...process.env,
+      KUBECTL: kubectl,
+    }
+  });
 
   const currentContext = commandOutputToArray(stdout)[0];
 
@@ -23,7 +29,12 @@ export const getCurrentContext = async () => {
 };
 
 export const getAllContextes = async () => {
-  const { stdout } = await execFilePromise(`${path}`);
+  const { stdout } = await execFilePromise(`${kubectx}`, [], {
+    env: {
+      ...process.env,
+      KUBECTL: kubectl,
+    }
+  });
 
   const contextes = commandOutputToArray(stdout);
 
@@ -31,7 +42,12 @@ export const getAllContextes = async () => {
 };
 
 export const switchContext = async (newContextName: string) => {
-  await execFilePromise(`${path}`, [newContextName]);
+  await execFilePromise(`${kubectx}`, [newContextName], {
+    env: {
+      ...process.env,
+      KUBECTL: kubectl,
+    }
+  });
 };
 
 export default {

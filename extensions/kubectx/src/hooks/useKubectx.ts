@@ -1,4 +1,4 @@
-import { closeMainWindow, showToast, ToastStyle } from "@raycast/api";
+import { closeMainWindow, showHUD, showToast, ToastStyle } from "@raycast/api";
 import { useEffect, useState } from "react";
 
 import kubectxService from "../services/kubectx.service";
@@ -31,6 +31,7 @@ const useKubectx = () => {
       await kubectxService.switchContext(newContextName);
       setCurrrentContext(newContextName);
       await closeMainWindow();
+      showHUD(`Switched to ${newContextName}`);
     } catch (e) {
       showToast(ToastStyle.Failure, "An error occurred");
     }
